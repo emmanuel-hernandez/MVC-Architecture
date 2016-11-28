@@ -1,5 +1,0 @@
-com\efe13\mvc\commons\api\exception\MapeableException.class
-com\efe13\mvc\commons\api\exception\ServiceException.class
-com\efe13\mvc\commons\api\exception\DAOException.class
-com\efe13\mvc\commons\api\CrudOperations.class
-com\efe13\mvc\commons\api\Mappeable.class
