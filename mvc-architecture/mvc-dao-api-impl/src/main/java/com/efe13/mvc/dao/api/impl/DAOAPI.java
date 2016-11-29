@@ -3,8 +3,6 @@ package com.efe13.mvc.dao.api.impl;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlTransient;
-
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -35,7 +33,8 @@ public abstract class DAOAPI<T> implements IDAO<EntityAPI> {
 	@Override
 	public List<EntityAPI> getAll() {
 		try {
-			return getSession().createQuery( "FROM " + persistenteClass.getName() ).list();
+			return getSession().createQuery( "FROM " + persistenteClass.getSimpleName() ).list();
+			
 		}
 		catch( Exception ex ) {
 			log.error( ex.getMessage() );
@@ -72,11 +71,11 @@ public abstract class DAOAPI<T> implements IDAO<EntityAPI> {
 		}
 	}
 	
-	protected Session getSession() {
+	protected final Session getSession() {
 		return sessionFactory.openSession();
 	}
 	
-	private static SessionFactory createSessionFactory() {
+	private final static SessionFactory createSessionFactory() {
 		final StandardServiceRegistry registry = new StandardServiceRegistryBuilder().configure().build();
 		
 		try {
