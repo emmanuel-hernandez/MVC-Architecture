@@ -22,17 +22,17 @@ public abstract class ServiceAPI implements IService<DTOAPI> {
 	}
 
 	@Override
-	public int save(DTOAPI object) {
+	public Number save(DTOAPI object) {
 		throw new ServiceException( "This method has not implementation. It needs to be implemented by the concrete class" );
 	}
 
 	@Override
-	public boolean update(DTOAPI object) {
+	public Boolean update(DTOAPI object) {
 		throw new ServiceException( "This method has not implementation. It needs to be implemented by the concrete class" );
 	}
 
 	@Override
-	public boolean delete(DTOAPI object) {
+	public Boolean delete(DTOAPI object) {
 		throw new ServiceException( "This method has not implementation. It needs to be implemented by the concrete class" );
 	}
 	

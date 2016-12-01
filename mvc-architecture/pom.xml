@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.efe13.mvc</groupId>
   <artifactId>mvc-architecture</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0.0.RELEASE</version>
   <packaging>pom</packaging>
   <name>MVC Architecture</name>
   <modules>
@@ -15,9 +15,17 @@
   	<module>mvc-service-api-impl</module>
   </modules>
   <properties>
+  	<!-- Modules versions -->
+  	<dao.api.version>1.0.0.RELEASE</dao.api.version>
+  	<service.api.version>1.0.0.RELEASE</service.api.version>
+  	<model.api.version>1.0.0.RELEASE</model.api.version>
+  	<commons.api.version>1.0.0.RELEASE</commons.api.version>
+  	
+	<!-- Library versions -->
   	<log4j.version>1.2.17</log4j.version>
   	<hibernate.version>5.0.11.Final</hibernate.version>
   	<mysql.jdbc.version>5.1.6</mysql.jdbc.version>
+  	<model.mapper.version>0.7.5</model.mapper.version>
   </properties>
   <dependencies>
   	<dependency>

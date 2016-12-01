@@ -3,21 +3,21 @@
   <parent>
     <groupId>com.efe13.mvc</groupId>
     <artifactId>mvc-architecture</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>${service.api.version}</version>
   </parent>
+  
   <artifactId>mvc-service-api</artifactId>
   <name>MVC Architecture - Service API</name>
-  
   <dependencies>
   	<dependency>
   		<groupId>com.efe13.mvc</groupId>
   		<artifactId>mvc-commons-api</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
+  		<version>${commons.api.version}</version>
   	</dependency>
   	<dependency>
   		<groupId>com.efe13.mvc</groupId>
   		<artifactId>mvc-model-api</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
+  		<version>${model.api.version}</version>
   	</dependency>
   </dependencies>
 </project>

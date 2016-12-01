@@ -3,9 +3,8 @@
   <parent>
     <groupId>com.efe13.mvc</groupId>
     <artifactId>mvc-architecture</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>${commons.api.version}</version>
   </parent>
-  
   
   <artifactId>mvc-commons-api</artifactId>
   <name>MVC Architecture - Commons API</name>

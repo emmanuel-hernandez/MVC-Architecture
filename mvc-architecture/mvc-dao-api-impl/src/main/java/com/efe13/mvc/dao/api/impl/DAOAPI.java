@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -43,30 +44,53 @@ public abstract class DAOAPI<T> implements IDAO<EntityAPI> {
 	}
 
 	@Override
-	public int save(EntityAPI object) throws HibernateException {
-		return (Integer) getSession().save( object );
+	public Number save(EntityAPI object) throws HibernateException {
+		Session session = getSession();
+		Transaction tx = session.beginTransaction();
+		Number generatedId = 0;
+		
+		try {
+			generatedId = (Number) session.save( object );
+			tx.commit();
+		}
+		catch( Exception ex ) {
+			tx.rollback();
+			throw ex;
+		}
+		
+		return generatedId;
 	}
 
 	@Override
-	public boolean update(EntityAPI object) throws HibernateException {
+	public Boolean update(EntityAPI object) throws HibernateException {
+		Session session = getSession();
+		Transaction tx = session.beginTransaction();
+
 		try {
-			getSession().update( object );
+			session.update( object );
+			tx.commit();
 			return true;
 		}
 		catch( Exception ex ) {
 			log.error( ex.getMessage() );
+			tx.rollback();
 			throw ex;
 		}
 	}
 
 	@Override
-	public boolean delete(EntityAPI object) {
+	public Boolean delete(EntityAPI object) {
+		Session session = getSession();
+		Transaction tx = session.beginTransaction();
+		
 		try {
-			getSession().delete( object );
+			session.delete( object );
+			tx.commit();
 			return true;
 		}
 		catch( Exception ex ) {
 			log.error( ex.getMessage() );
+			tx.rollback();
 			throw ex;
 		}
 	}

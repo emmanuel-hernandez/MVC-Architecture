@@ -17,10 +17,10 @@ public interface CrudOperations<T> {
 	
 	public List<T> getAll();
 	
-	public int save( T object );
+	public Number save( T object );
 	
-	public boolean update( T object );
+	public Boolean update( T object );
 	
-	public boolean delete( T object );
+	public Boolean delete( T object );
 
 }
