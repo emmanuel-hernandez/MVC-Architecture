@@ -38,7 +38,7 @@ public abstract class DAOAPI<T> implements IDAO<EntityAPI> {
 			
 		}
 		catch( Exception ex ) {
-			log.error( ex.getMessage() );
+			log.error( ex.getMessage(), ex );
 			throw ex;
 		}
 	}
@@ -54,6 +54,7 @@ public abstract class DAOAPI<T> implements IDAO<EntityAPI> {
 			tx.commit();
 		}
 		catch( Exception ex ) {
+			log.error( ex.getMessage(), ex );
 			tx.rollback();
 			throw ex;
 		}
@@ -72,7 +73,7 @@ public abstract class DAOAPI<T> implements IDAO<EntityAPI> {
 			return true;
 		}
 		catch( Exception ex ) {
-			log.error( ex.getMessage() );
+			log.error( ex.getMessage(), ex );
 			tx.rollback();
 			throw ex;
 		}
@@ -89,7 +90,7 @@ public abstract class DAOAPI<T> implements IDAO<EntityAPI> {
 			return true;
 		}
 		catch( Exception ex ) {
-			log.error( ex.getMessage() );
+			log.error( ex.getMessage(), ex );
 			tx.rollback();
 			throw ex;
 		}
@@ -107,11 +108,8 @@ public abstract class DAOAPI<T> implements IDAO<EntityAPI> {
 		}
 		catch( Exception ex ) {
 			StandardServiceRegistryBuilder.destroy( registry );
-			System.out.println( "EXCEPTION !!!!!!!" );
-			ex.printStackTrace();
-			//log.error( ex.getMessage() );
-			
-			return null;
+			log.error( ex.getMessage(), ex );
+			throw ex;
 		}
 	}
 }

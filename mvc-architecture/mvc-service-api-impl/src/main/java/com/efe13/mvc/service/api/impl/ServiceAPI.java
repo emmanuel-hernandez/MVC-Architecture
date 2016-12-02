@@ -4,12 +4,13 @@ import java.util.List;
 
 import org.modelmapper.ModelMapper;
 
-import com.efe13.mvc.commons.api.Mappeable;
 import com.efe13.mvc.commons.api.exception.ServiceException;
+import com.efe13.mvc.commons.api.interfaces.Mappeable;
+import com.efe13.mvc.commons.api.util.Utilities;
 import com.efe13.mvc.model.api.impl.dto.DTOAPI;
 import com.efe13.mvc.service.api.IService;
 
-public abstract class ServiceAPI implements IService<DTOAPI> {
+public abstract class ServiceAPI extends Utilities<DTOAPI> implements IService<DTOAPI> {
 
 	@Override
 	public DTOAPI getById(DTOAPI object) {

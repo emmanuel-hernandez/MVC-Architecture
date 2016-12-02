@@ -1,7 +1,7 @@
 /**
  * Co
  */
-package com.efe13.mvc.commons.api;
+package com.efe13.mvc.commons.api.interfaces;
 
 import java.util.List;
 
