@@ -36,10 +36,10 @@ public abstract class ServiceAPI extends Utilities<DTOAPI> implements IService<D
 	public Boolean delete(DTOAPI object) {
 		throw new ServiceException( "This method has not implementation. It needs to be implemented by the concrete class" );
 	}
-	
-	@Override
-	public Mappeable map( Mappeable source, Mappeable destination ) {
-		return new ModelMapper().map( source, destination.getClass() );
-	}
 
+	@Override
+	public Mappeable map(Mappeable source, Mappeable destination) {
+		destination = new ModelMapper().map( source, destination.getClass() );
+		return destination;
+	}
 }
