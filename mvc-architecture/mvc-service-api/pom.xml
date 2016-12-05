@@ -3,7 +3,7 @@
   <parent>
     <groupId>com.efe13.mvc</groupId>
     <artifactId>mvc-architecture</artifactId>
-    <version>${service.api.version}</version>
+    <version>1.0.0.RELEASE</version>
   </parent>
   
   <artifactId>mvc-service-api</artifactId>
