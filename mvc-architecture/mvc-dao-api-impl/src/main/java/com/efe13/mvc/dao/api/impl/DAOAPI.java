@@ -107,9 +107,9 @@ public abstract class DAOAPI<T> implements IDAO<EntityAPI> {
 	}
 	
 	protected final void closeSession() {
-		if( sessionFactory != null && !sessionFactory.isClosed() ) {
+		/*if( sessionFactory != null && !sessionFactory.isClosed() ) {
 			sessionFactory.close();
-		}
+		}*/
 	}
 	
 	protected final Session getSession() {
