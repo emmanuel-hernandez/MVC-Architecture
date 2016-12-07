@@ -8,17 +8,15 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.boot.MetadataSources;
-import org.hibernate.boot.registry.StandardServiceRegistry;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 
 import com.efe13.mvc.commons.api.exception.DAOException;
 import com.efe13.mvc.dao.api.IDAO;
+import com.efe13.mvc.dao.api.impl.util.HibernateUtil;
 import com.efe13.mvc.model.api.impl.entity.EntityAPI;
 
 public abstract class DAOAPI<T> implements IDAO<EntityAPI> {
 
-	private final static SessionFactory sessionFactory = createSessionFactory();
+	private final static SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
 	private final Class<T> persistenteClass;
 	private final static Logger log = Logger.getLogger( DAOAPI.class );
 	
@@ -41,6 +39,9 @@ public abstract class DAOAPI<T> implements IDAO<EntityAPI> {
 			log.error( ex.getMessage(), ex );
 			throw ex;
 		}
+		finally {
+			closeSession();
+		}
 	}
 
 	@Override
@@ -57,6 +58,9 @@ public abstract class DAOAPI<T> implements IDAO<EntityAPI> {
 			log.error( ex.getMessage(), ex );
 			tx.rollback();
 			throw ex;
+		}
+		finally {
+			closeSession();
 		}
 		
 		return generatedId;
@@ -77,6 +81,9 @@ public abstract class DAOAPI<T> implements IDAO<EntityAPI> {
 			tx.rollback();
 			throw ex;
 		}
+		finally {
+			closeSession();
+		}
 	}
 
 	@Override
@@ -94,22 +101,39 @@ public abstract class DAOAPI<T> implements IDAO<EntityAPI> {
 			tx.rollback();
 			throw ex;
 		}
+		finally {
+			closeSession();
+		}
+	}
+	
+	protected final void closeSession() {
+		if( sessionFactory != null && !sessionFactory.isClosed() ) {
+			sessionFactory.close();
+		}
 	}
 	
 	protected final Session getSession() {
+		System.out.println( "ABRIENDO SESSION...." );
 		return sessionFactory.openSession();
 	}
-	
+	/*
 	private final static SessionFactory createSessionFactory() {
-		final StandardServiceRegistry registry = new StandardServiceRegistryBuilder().configure().build();
-		
-		try {
-			return new MetadataSources( registry ).buildMetadata().buildSessionFactory();
+		if( sessionFactory == null ) {
+			System.out.println( "CREANDO SESSION...." );
+			final StandardServiceRegistry registry = new StandardServiceRegistryBuilder().configure().build();
+			
+			try {
+				return new MetadataSources( registry ).buildMetadata().buildSessionFactory();
+			}
+			catch( Exception ex ) {
+				StandardServiceRegistryBuilder.destroy( registry );
+				log.error( ex.getMessage(), ex );
+				throw ex;
+			}
 		}
-		catch( Exception ex ) {
-			StandardServiceRegistryBuilder.destroy( registry );
-			log.error( ex.getMessage(), ex );
-			throw ex;
+		else {
+			return sessionFactory;
 		}
 	}
+	*/
 }
