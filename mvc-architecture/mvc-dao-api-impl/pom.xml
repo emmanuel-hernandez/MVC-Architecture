@@ -3,7 +3,7 @@
   <parent>
     <groupId>com.efe13.mvc</groupId>
     <artifactId>mvc-architecture</artifactId>
-    <version>${dao.api.version}</version>
+    <version>1.0.0.RELEASE</version>
   </parent>
   <artifactId>mvc-dao-api-impl</artifactId>
   <name>MVC Architecture - DAO API Impl</name>
