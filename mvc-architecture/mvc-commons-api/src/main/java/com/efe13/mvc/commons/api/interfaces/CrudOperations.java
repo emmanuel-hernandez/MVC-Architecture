@@ -15,7 +15,7 @@ public interface CrudOperations<T> {
 	
 	public T getById( T object );
 	
-	public List<T> getAll();
+	public <E> List<T> getAll( E object );
 	
 	public Number save( T object );
 	

@@ -23,6 +23,20 @@ public abstract class DAOAPI<T> implements IDAO<EntityAPI> {
 	public DAOAPI() {
 		persistenteClass = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass() ).getActualTypeArguments()[0];
 	}
+	
+	@Override
+	public Integer getTotalRecords() {
+		try {
+			return (Integer) getSession().createQuery( "COUNT(*) FROM " + persistenteClass.getSimpleName() ).uniqueResult();
+		}
+		catch( Exception ex ) {
+			log.error( ex.getMessage(), ex );
+			throw ex;
+		}
+		finally {
+			closeSession();
+		}
+	}
 
 	@Override
 	public EntityAPI getById(EntityAPI object) throws HibernateException, DAOException {
@@ -30,7 +44,7 @@ public abstract class DAOAPI<T> implements IDAO<EntityAPI> {
 	}
 
 	@Override
-	public List<EntityAPI> getAll() {
+	public <E> List<EntityAPI> getAll( E queryHelper ) {
 		try {
 			return getSession().createQuery( "FROM " + persistenteClass.getSimpleName() ).list();
 			

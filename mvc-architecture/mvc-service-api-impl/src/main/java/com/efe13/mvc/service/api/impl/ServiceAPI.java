@@ -12,13 +12,15 @@ import com.efe13.mvc.service.api.IService;
 
 public abstract class ServiceAPI extends Utilities<DTOAPI> implements IService<DTOAPI> {
 
+	
+	
 	@Override
 	public DTOAPI getById(DTOAPI object) {
 		throw new ServiceException( "This method has not implementation. It needs to be implemented by the concrete class" );
 	}
 
 	@Override
-	public List<DTOAPI> getAll() {
+	public <E> List<DTOAPI> getAll(E queryHelper) {
 		throw new ServiceException( "This method has not implementation. It needs to be implemented by the concrete class" );
 	}
 
