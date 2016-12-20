@@ -4,6 +4,7 @@ public class QueryHelper {
 
 	private PaginationAPI paginationAPI;
 	private FilterAPI filterAPI;
+	private OrderAPI orderAPI;
 	
 	public PaginationAPI getPaginationAPI() {
 		return paginationAPI;
@@ -20,5 +21,12 @@ public class QueryHelper {
 	public void setFilterAPI(FilterAPI filterAPI) {
 		this.filterAPI = filterAPI;
 	}
-	
+
+	public OrderAPI getOrderAPI() {
+		return orderAPI;
+	}
+
+	public void setOrderAPI(OrderAPI orderAPI) {
+		this.orderAPI = orderAPI;
+	}
 }

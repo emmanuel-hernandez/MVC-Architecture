@@ -4,30 +4,45 @@ import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.StandardServiceRegistry;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 
+import com.efe13.mvc.commons.api.enums.ActiveEnum;
 import com.efe13.mvc.commons.api.exception.DAOException;
+import com.efe13.mvc.commons.api.util.Utils;
 import com.efe13.mvc.dao.api.IDAO;
-import com.efe13.mvc.dao.api.impl.util.HibernateUtil;
 import com.efe13.mvc.model.api.impl.entity.EntityAPI;
+import com.efe13.mvc.model.api.impl.helper.QueryHelper;
 
 public abstract class DAOAPI<T> implements IDAO<EntityAPI> {
 
-	private final static SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-	private final Class<T> persistenteClass;
+	private SessionFactory sessionFactory;
+	private final Class<T> criteriaClass;
 	private final static Logger log = Logger.getLogger( DAOAPI.class );
 	
-	public DAOAPI() {
-		persistenteClass = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass() ).getActualTypeArguments()[0];
+	private String columnNameForActiveElement;
+	private ActiveEnum activeEnum;
+	
+	public DAOAPI(String columnNameForActiveElement, ActiveEnum activeEnum) {
+		this.columnNameForActiveElement = columnNameForActiveElement;
+		this.activeEnum = activeEnum;
+		
+		createSessionFactory();
+		criteriaClass = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass() ).getActualTypeArguments()[0];
 	}
 	
 	@Override
 	public Integer getTotalRecords() {
 		try {
-			return (Integer) getSession().createQuery( "COUNT(*) FROM " + persistenteClass.getSimpleName() ).uniqueResult();
+			return (Integer) getSession().createQuery( "COUNT(*) FROM " + criteriaClass.getSimpleName() ).uniqueResult();
 		}
 		catch( Exception ex ) {
 			log.error( ex.getMessage(), ex );
@@ -39,25 +54,50 @@ public abstract class DAOAPI<T> implements IDAO<EntityAPI> {
 	}
 
 	@Override
-	public EntityAPI getById(EntityAPI object) throws HibernateException, DAOException {
-		throw new DAOException( "This method has not implementation" );
-	}
-
-	@Override
-	public <E> List<EntityAPI> getAll( E queryHelper ) {
+	public EntityAPI getById( EntityAPI object ) throws HibernateException, DAOException {
 		try {
-			return getSession().createQuery( "FROM " + persistenteClass.getSimpleName() ).list();
+			Criteria criteria = getCriteria()
+				.add( Restrictions.idEq( object.getId() ) )
+				.add( Restrictions.eq( columnNameForActiveElement, activeEnum.getValue() ) );
 			
-		}
-		catch( Exception ex ) {
-			log.error( ex.getMessage(), ex );
-			throw ex;
+			return (EntityAPI) criteria.uniqueResult();
 		}
 		finally {
 			closeSession();
 		}
 	}
-
+	
+	@Override
+	public <E> List<EntityAPI> getAll( E helper ) {
+		try {
+			if( !Utils.isNull( helper ) && !(helper instanceof QueryHelper) ) {
+				throw new RuntimeException( "Query Helper expected!" );
+			}
+			QueryHelper queryHelper = (QueryHelper) helper;
+			
+			Criteria criteria = getCriteria()
+				.add( Restrictions.eq( columnNameForActiveElement, activeEnum.getValue() ) );
+			
+			if( !Utils.isNull( helper ) ) {
+				if( !Utils.isNull( queryHelper.getPaginationAPI() ) ) {
+					criteria.setFirstResult( queryHelper.getPaginationAPI().getPage() );
+					criteria.setMaxResults( queryHelper.getPaginationAPI().getPageSize() );
+				}
+				
+				if( !Utils.isNull( queryHelper.getOrderAPI() ) ) {
+					criteria.addOrder( (queryHelper.getOrderAPI().isAscending()) ?
+										Order.asc( queryHelper.getOrderAPI().getField() ) :
+										Order.desc( queryHelper.getOrderAPI().getField() ) );
+				}
+			}
+			
+			return criteria.list();
+		}
+		finally {
+			closeSession();
+		}
+	}
+	
 	@Override
 	public Number save(EntityAPI object) throws HibernateException {
 		Session session = getSession();
@@ -79,6 +119,7 @@ public abstract class DAOAPI<T> implements IDAO<EntityAPI> {
 		
 		return generatedId;
 	}
+	
 
 	@Override
 	public Boolean update(EntityAPI object) throws HibernateException {
@@ -99,6 +140,7 @@ public abstract class DAOAPI<T> implements IDAO<EntityAPI> {
 			closeSession();
 		}
 	}
+	
 
 	@Override
 	public Boolean delete(EntityAPI object) {
@@ -120,24 +162,34 @@ public abstract class DAOAPI<T> implements IDAO<EntityAPI> {
 		}
 	}
 	
+	
 	protected final void closeSession() {
 		/*if( sessionFactory != null && !sessionFactory.isClosed() ) {
 			sessionFactory.close();
 		}*/
 	}
+		
+	protected Criteria getCriteria() {
+		return getCriteria( "_this" );
+	}
 	
-	protected final Session getSession() {
-		System.out.println( "ABRIENDO SESSION...." );
+	protected Criteria getCriteria( String alias ) {
+		if( Utils.isEmpty( alias ) )
+			return getSession().createCriteria( criteriaClass );
+		
+		return getSession().createCriteria( criteriaClass, alias );
+	}
+	
+	private final Session getSession() {
 		return sessionFactory.openSession();
 	}
-	/*
-	private final static SessionFactory createSessionFactory() {
+	
+	private final void createSessionFactory() {
 		if( sessionFactory == null ) {
-			System.out.println( "CREANDO SESSION...." );
 			final StandardServiceRegistry registry = new StandardServiceRegistryBuilder().configure().build();
 			
 			try {
-				return new MetadataSources( registry ).buildMetadata().buildSessionFactory();
+				sessionFactory = new MetadataSources( registry ).buildMetadata().buildSessionFactory();
 			}
 			catch( Exception ex ) {
 				StandardServiceRegistryBuilder.destroy( registry );
@@ -145,9 +197,5 @@ public abstract class DAOAPI<T> implements IDAO<EntityAPI> {
 				throw ex;
 			}
 		}
-		else {
-			return sessionFactory;
-		}
 	}
-	*/
 }

@@ -4,6 +4,8 @@ public final class Utils {
 	
 	private Utils() {
 	}
+	
+	public static final String ID_COLUMN_NAME = "id";
 
 	public static boolean isNegative( short number ) {
 		return isNegative( (int) number );
