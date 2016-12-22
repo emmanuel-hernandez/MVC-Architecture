@@ -9,9 +9,6 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.boot.MetadataSources;
-import org.hibernate.boot.registry.StandardServiceRegistry;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
@@ -19,12 +16,13 @@ import com.efe13.mvc.commons.api.enums.ActiveEnum;
 import com.efe13.mvc.commons.api.exception.DAOException;
 import com.efe13.mvc.commons.api.util.Utils;
 import com.efe13.mvc.dao.api.IDAO;
+import com.efe13.mvc.dao.api.impl.util.HibernateUtil;
 import com.efe13.mvc.model.api.impl.entity.EntityAPI;
 import com.efe13.mvc.model.api.impl.helper.QueryHelper;
 
 public abstract class DAOAPI<T> implements IDAO<EntityAPI> {
 
-	private SessionFactory sessionFactory;
+	private static final SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
 	private final Class<T> criteriaClass;
 	private final static Logger log = Logger.getLogger( DAOAPI.class );
 	
@@ -35,7 +33,7 @@ public abstract class DAOAPI<T> implements IDAO<EntityAPI> {
 		this.columnNameForActiveElement = columnNameForActiveElement;
 		this.activeEnum = activeEnum;
 		
-		createSessionFactory();
+		//createSessionFactory();
 		criteriaClass = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass() ).getActualTypeArguments()[0];
 	}
 	
@@ -183,7 +181,7 @@ public abstract class DAOAPI<T> implements IDAO<EntityAPI> {
 	private final Session getSession() {
 		return sessionFactory.openSession();
 	}
-	
+	/*
 	private final void createSessionFactory() {
 		if( sessionFactory == null ) {
 			final StandardServiceRegistry registry = new StandardServiceRegistryBuilder().configure().build();
@@ -198,4 +196,5 @@ public abstract class DAOAPI<T> implements IDAO<EntityAPI> {
 			}
 		}
 	}
+	*/
 }
