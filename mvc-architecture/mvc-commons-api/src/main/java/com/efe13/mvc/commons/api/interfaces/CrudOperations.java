@@ -13,6 +13,8 @@ import java.util.List;
  */
 public interface CrudOperations<T> {
 	
+	public long getTableCount();
+	
 	public T getById( T object );
 	
 	public <E> List<T> getAll( E object );

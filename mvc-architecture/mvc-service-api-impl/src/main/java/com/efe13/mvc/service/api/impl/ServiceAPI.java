@@ -6,13 +6,16 @@ import org.modelmapper.ModelMapper;
 
 import com.efe13.mvc.commons.api.exception.ServiceException;
 import com.efe13.mvc.commons.api.interfaces.Mappeable;
-import com.efe13.mvc.commons.api.util.Utilities;
+import com.efe13.mvc.commons.api.util.ServiceUtilities;
 import com.efe13.mvc.model.api.impl.dto.DTOAPI;
 import com.efe13.mvc.service.api.IService;
 
-public abstract class ServiceAPI extends Utilities<DTOAPI> implements IService<DTOAPI> {
+public abstract class ServiceAPI extends ServiceUtilities<DTOAPI> implements IService<DTOAPI> {
 
-	
+	@Override
+	public long getTableCount() {
+		throw new ServiceException( "This method has not implementation. It needs to be implemented by the concrete class" );
+	}
 	
 	@Override
 	public DTOAPI getById(DTOAPI object) {
@@ -23,7 +26,7 @@ public abstract class ServiceAPI extends Utilities<DTOAPI> implements IService<D
 	public <E> List<DTOAPI> getAll(E queryHelper) {
 		throw new ServiceException( "This method has not implementation. It needs to be implemented by the concrete class" );
 	}
-
+	
 	@Override
 	public Number save(DTOAPI object) {
 		throw new ServiceException( "This method has not implementation. It needs to be implemented by the concrete class" );

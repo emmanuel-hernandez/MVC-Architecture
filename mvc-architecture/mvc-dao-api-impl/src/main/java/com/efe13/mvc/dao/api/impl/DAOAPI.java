@@ -2,6 +2,7 @@ package com.efe13.mvc.dao.api.impl;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
@@ -9,8 +10,11 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 
 import com.efe13.mvc.commons.api.enums.ActiveEnum;
 import com.efe13.mvc.commons.api.exception.DAOException;
@@ -38,9 +42,11 @@ public abstract class DAOAPI<T> implements IDAO<EntityAPI> {
 	}
 	
 	@Override
-	public Integer getTotalRecords() {
+	public long getTableCount() {
 		try {
-			return (Integer) getSession().createQuery( "COUNT(*) FROM " + criteriaClass.getSimpleName() ).uniqueResult();
+			return (long) getCriteria()
+								.setProjection( Projections.rowCount() )
+								.add( Restrictions.eq( columnNameForActiveElement, activeEnum.getValue() ) ).uniqueResult();
 		}
 		catch( Exception ex ) {
 			log.error( ex.getMessage(), ex );
@@ -76,16 +82,42 @@ public abstract class DAOAPI<T> implements IDAO<EntityAPI> {
 			Criteria criteria = getCriteria()
 				.add( Restrictions.eq( columnNameForActiveElement, activeEnum.getValue() ) );
 			
+			//Check for QueryHelper
 			if( !Utils.isNull( helper ) ) {
+				
+				//Check for PaginationAPI
 				if( !Utils.isNull( queryHelper.getPaginationAPI() ) ) {
-					criteria.setFirstResult( queryHelper.getPaginationAPI().getPage() );
+					int firstResult = (queryHelper.getPaginationAPI().getCurrentPage() - 1) * queryHelper.getPaginationAPI().getPageSize();
+					criteria.setFirstResult( firstResult );
 					criteria.setMaxResults( queryHelper.getPaginationAPI().getPageSize() );
 				}
 				
+				//Check for OrderAPI
 				if( !Utils.isNull( queryHelper.getOrderAPI() ) ) {
-					criteria.addOrder( (queryHelper.getOrderAPI().isAscending()) ?
-										Order.asc( queryHelper.getOrderAPI().getField() ) :
-										Order.desc( queryHelper.getOrderAPI().getField() ) );
+					String field = queryHelper.getOrderAPI().getField();
+					if( !Utils.isNull( field ) ) {
+						if( field.contains( "." ) ) {
+							String[] parts = field.split( "\\." );
+							criteria.createAlias( parts[0], parts[0], JoinType.INNER_JOIN );
+						}
+						
+						criteria.addOrder( (queryHelper.getOrderAPI().isAscending()) ?
+											Order.asc( field ) :
+											Order.desc( field ) );
+					}
+				}
+
+				//Check for FilterAPI
+				if( !Utils.isNull( queryHelper.getFilterAPI() ) ) {
+					if( !Utils.isNull( queryHelper.getFilterAPI().getFilter() ) ) {
+						Disjunction or = Restrictions.disjunction();
+						for( Entry<String, String> entry : queryHelper.getFilterAPI().getFilter().entrySet() ) {
+							if( !Utils.isEmpty( entry.getValue() ) ) {
+								or.add( Restrictions.ilike( entry.getKey(), "%" + entry.getValue() + "%" ) );
+							}
+						}
+						criteria.add( or );
+					}
 				}
 			}
 			
@@ -95,7 +127,7 @@ public abstract class DAOAPI<T> implements IDAO<EntityAPI> {
 			closeSession();
 		}
 	}
-	
+
 	@Override
 	public Number save(EntityAPI object) throws HibernateException {
 		Session session = getSession();
@@ -181,6 +213,8 @@ public abstract class DAOAPI<T> implements IDAO<EntityAPI> {
 	private final Session getSession() {
 		return sessionFactory.openSession();
 	}
+	
+	
 	/*
 	private final void createSessionFactory() {
 		if( sessionFactory == null ) {
